@@ -1,4 +1,5 @@
 <script>
+	import Vue from 'vue'
 	export default {
 		onLaunch: function() {
 			console.log('App Launch')
@@ -37,4 +38,6 @@
 
 <style>
 	/*每个页面公共css */
+	@import url("@/static/icon/icon.css");
+	@import url("@/static/css/main.css");
 </style>
