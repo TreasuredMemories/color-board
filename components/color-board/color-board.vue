@@ -13,7 +13,7 @@
 		<!-- copy area -->
 		<view class="copy_area flex">
 			<view class="copy_box flex">
-				<view class="copy_button flex-sub">
+				<view class="copy_button flex-sub" @tap="copyReference">
 					<view class="cuIcon-copy solid-right"></view>
 				</view>
 				<view class="color_value flex-treble">{{chooseColor}}</view>
@@ -37,12 +37,11 @@
 		</view>
 		<!-- container -->
 		<view>
-			<!-- board -->
-			<view>
-				<roundboard @change="pickColor"></roundboard>
+			<view class=" shadow-lg margin-xs" style="height: 100vw;">
+				<roundboard @change="pickColor" v-if="TabCur==0"></roundboard>
+				<classicalboard @change="pickColor" v-if="TabCur==1"></classicalboard>
+				</swiper>
 			</view>
-			<!-- slider -->
-			<view></view>
 		</view>
 
 	</view>
@@ -50,10 +49,12 @@
 
 <script>
 	import roundboard from "./mode/round-board.vue"
+	import classicalboard from "./mode/classical-board.vue"
 	export default {
 		name: 'color-board',
 		components: {
-			roundboard
+			roundboard,
+			classicalboard
 		},
 		data() {
 			return {
@@ -67,12 +68,6 @@
 					},
 					{
 						name: "经典"
-					},
-					{
-						name: "值"
-					},
-					{
-						name: "CMYK"
 					}
 				]
 			};
@@ -84,14 +79,20 @@
 			},
 			pickColor(color) {
 				this.chooseColor = color
+			},
+			copyReference() {
+				wx.setClipboardData({
+					data: "微信小程序 #notesbook 分享好用工具,记录精品笔记。--->>>" + this.chooseColor, //要复制的数据
+					success(res) {
+						console.log(res)
+					}
+				})
 			}
 		}
 	}
 </script>
 
 <style>
-
-
 	/* color */
 	.bg-black {
 		background-color: black;
@@ -173,5 +174,4 @@
 	.mode_item {
 		border-radius: 10px;
 	}
-
 </style>

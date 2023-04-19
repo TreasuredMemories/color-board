@@ -5,9 +5,6 @@
 				height: 100%;" @touchmove="drag">
 			</canvas>
 		</view>
-		<view class="slider">
-			<slider activeColor="transparent" backgroundColor="transparent" class="ribbon" max="360"></slider>
-		</view>
 	</view>
 </template>
 
@@ -16,25 +13,27 @@
 		name: 'round-board',
 		data() {
 			return {
-				x: 0,
-				y: 0,
+				x: 0, //mouse point
+				y: 0, // mouse point
 				centerX: 0,
 				centerY: 0,
+				hsv: {},
+				colorRes: ''
 			};
 		},
 		mounted() {
 			this.boardInit()
 		},
 		methods: {
+			/**
+			 *  initialize the Color board
+			 */
 			boardInit() {
 				let ctx = uni.createCanvasContext('boardcanvas', this)
-				console.log(ctx)
 				var view = uni.createSelectorQuery().in(this).select("#canvas");
 				view.boundingClientRect(data => {
 					var width = data.width
 					var height = data.height
-					console.log("data")
-					console.log(width, height)
 					const centerX = width / 2;
 					const centerY = height / 2;
 					this.x = centerX
@@ -42,7 +41,6 @@
 					this.centerX = centerX
 					this.centerY = centerY
 					const radius = Math.min(centerX, centerY) - 10;
-					// 绘制圆形调色板
 					for (let angle = 0; angle < 360; angle++) {
 						const startAngle = angle * Math.PI / 180;
 						const endAngle = (angle + 1) * Math.PI / 180;
@@ -77,9 +75,62 @@
 					}
 					const saturation = distance / radius;
 					const lightness = 0.5;
+					this.hsv.h = hue
+					this.hsv.v = lightness * 100
 					const color = `hsl(${hue}, ${saturation * 100}%, ${lightness * 100}%)`;
 					this.$emit('change', this.hslTohex(hue, saturation, lightness));
 				}).exec()
+			},
+			/**
+			 *
+			 */
+			hsv2rgb(h, s, v) {
+				let hsv_h = (h / 360).toFixed(2);
+				let hsv_s = (s / 100).toFixed(2);
+				let hsv_v = (v / 100).toFixed(2);
+
+				var i = Math.floor(hsv_h * 6);
+				var f = hsv_h * 6 - i;
+				var p = hsv_v * (1 - hsv_s);
+				var q = hsv_v * (1 - f * hsv_s);
+				var t = hsv_v * (1 - (1 - f) * hsv_s);
+
+				var rgb_r = 0,
+					rgb_g = 0,
+					rgb_b = 0;
+				switch (i % 6) {
+					case 0:
+						rgb_r = hsv_v;
+						rgb_g = t;
+						rgb_b = p;
+						break;
+					case 1:
+						rgb_r = q;
+						rgb_g = hsv_v;
+						rgb_b = p;
+						break;
+					case 2:
+						rgb_r = p;
+						rgb_g = hsv_v;
+						rgb_b = t;
+						break;
+					case 3:
+						rgb_r = p;
+						rgb_g = q;
+						rgb_b = hsv_v;
+						break;
+					case 4:
+						rgb_r = t;
+						rgb_g = p;
+						rgb_b = hsv_v;
+						break;
+					case 5:
+						rgb_r = hsv_v, rgb_g = p, rgb_b = q;
+						break;
+				}
+
+				return 'rgb(' + (Math.floor(rgb_r * 255) + "," + Math.floor(rgb_g * 255) + "," + Math.floor(rgb_b * 255)) +
+					')';
 			},
 			/**
 			 *
@@ -134,25 +185,5 @@
 		position: absolute;
 		width: 100%;
 		height: 100%;
-	}
-
-	.ring {
-		background: radial-gradient(ellipse at center, rgb(247 235 234 / 5%) 42%, rgb(235 221 221 / 50%) 45%, rgb(237 230 230 / 50%) 50%, rgb(219 204 204 / 5%) 100%);
-		border-radius: 50%;
-		width: 32px;
-		height: 32px;
-		/* margin-top: -200px; */
-		/* margin-left: -200px; */
-		/* top: 14%; */
-		/* left: 14%; */
-		z-index: 3;
-	}
-
-
-	.ribbon {
-		background: -webkit-linear-gradient(left, rgba(0, 0, 0, 1), rgba(255, 255, 255, 1));
-		width: 90%;
-		margin: 10rpx auto;
-		border-radius: 5px;
 	}
 </style>
